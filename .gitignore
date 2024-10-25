@@ -1,0 +1,9 @@
+bin/
+obj/
+*.user
+*.suo
+*.sln.ide
+*.vs/
+*.db
+*.db-journal
+*.sqlite
