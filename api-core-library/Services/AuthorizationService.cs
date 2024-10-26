@@ -1,29 +1,29 @@
 using System;
 using api_core_library.Intefaces;
 using api_core_library.Models;
+using api_core_library.Repositories;
+using Microsoft.Data.SqlClient;
 
 namespace api_core_library.Services;
 
 public class AuthorizationService: IAuthorizationService
 {
-    private readonly IAccountRepository _accountRepository;
+    private readonly IUserRepository _userRepository;
     private readonly JwtService _jwtService;
 
-    public AuthorizationService(IAccountRepository accountRepository, JwtService jwtService)
+    public AuthorizationService( IUserRepository userRepository, JwtService jwtService)
     {
-        _accountRepository = accountRepository;
+        _userRepository = userRepository;
         _jwtService = jwtService;
     }
 
-    public string Authenticate(Account loginRequest)
+    public async Task<string> Authenticate(string username, string password)
     {
-        var acc = _accountRepository.GetUser(loginRequest.Username);
-        // temporary add hash checking
-        if (acc == null || acc.Password != loginRequest.Password)
+        var acc = await _userRepository.GetUserByUsernameAsync(username);
+        if (acc == null || !BCrypt.Net.BCrypt.Verify(password, acc.PasswordHash))
         {
             return null;
         }
-
-        return _jwtService.GenerateToken(acc.Username, acc.Role, 7);
+        return _jwtService.GenerateToken(acc);
     }
 }

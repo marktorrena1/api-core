@@ -3,7 +3,7 @@ using api_core_library.Models;
 
 namespace api_core_library.Intefaces;
 
-public interface IAccountRepository
+public interface IUserService
 {
-    Account GetUser(string username);
+    Task<IEnumerable<UserDto>> GetUser(UserDto user);
 }

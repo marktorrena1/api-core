@@ -1,5 +1,6 @@
 using System.Text;
 using api_core_library.Intefaces;
+using api_core_library.Middlewares;
 using api_core_library.Repositories;
 using api_core_library.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,15 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtConfig = builder.Configuration.GetSection("Jwt");
 
-// temporary as Singleton in memory
-builder.Services.AddSingleton<UserRepository, UserRepository>();
-builder.Services.AddSingleton<IAccountRepository, AccountRepository>();
-builder.Services.AddSingleton<JwtService>(serviceProvider => new JwtService(
+builder.Services.AddScoped<JwtService>(serviceProvider => new JwtService(
     jwtConfig["Key"],
     jwtConfig["Issuer"],
     jwtConfig["Audience"]
 ));
-builder.Services.AddSingleton<IAuthorizationService, AuthorizationService>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // authentication jwt configuration
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -77,6 +78,7 @@ builder.Services.AddApiVersioning(options =>
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
 });
 
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
@@ -86,6 +88,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ThrottlingMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

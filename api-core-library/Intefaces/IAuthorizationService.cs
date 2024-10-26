@@ -5,5 +5,5 @@ namespace api_core_library.Intefaces;
 
 public interface IAuthorizationService
 {
- string Authenticate(Account loginRequest);
+    Task<string> Authenticate(string username, string password);
 }

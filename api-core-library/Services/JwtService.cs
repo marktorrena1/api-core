@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using api_core_library.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace api_core_library.Services;
@@ -18,12 +19,13 @@ public class JwtService
         _audience = audience;
     }
 
-    public string GenerateToken(string username, string role, int expireDays)
+    public string GenerateToken(UserDto user)
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim("CompanyId", user.CompanyId.ToString()),
+            new Claim(ClaimTypes.Role, user.RoleName)
         };
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
@@ -33,7 +35,7 @@ public class JwtService
             issuer: _issuer,
             audience: _audience,
             claims: claims,
-            expires: DateTime.Now.AddDays(expireDays),
+            expires: DateTime.Now.AddDays(7),
             signingCredentials: credentials
         );
 

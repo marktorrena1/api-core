@@ -15,13 +15,13 @@ namespace api_core.Controllers
 
          public AuthController(IAuthorizationService authService)
         {
-            _authService = authService;
+            _authService =  authService;
         }
 
         [HttpPost("login")]
-        public ActionResult<string> Login(string username, string password)
+        public async Task<ActionResult<string>> Login(string username, string password)
         {
-            var token = _authService.Authenticate( new Account(){ Username = username, Password = password});
+            var token = await _authService.Authenticate(username, password);
 
             if (token == null)
             {

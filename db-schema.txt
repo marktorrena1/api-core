@@ -1,0 +1,73 @@
+
+
+CREATE TABLE Companies (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    CompanyName NVARCHAR(100) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE()
+);
+GO
+
+CREATE TABLE Users (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Username NVARCHAR(50) UNIQUE NOT NULL,
+    PasswordHash NVARCHAR(256) NOT NULL,
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    CompanyId INT,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    UpdatedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE SET NULL
+);
+GO
+
+CREATE TABLE Roles (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    RoleName NVARCHAR(50) UNIQUE NOT NULL
+);
+GO
+
+CREATE TABLE UserRoles (
+    UserId INT NOT NULL,
+    RoleId INT NOT NULL,
+    AssignedAt DATETIME DEFAULT GETDATE(),
+    PRIMARY KEY (UserId, RoleId),
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (RoleId) REFERENCES Roles(Id) ON DELETE CASCADE
+);
+GO
+
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    INSERT INTO Companies (CompanyName) 
+    VALUES ('Company 1'),
+           ('Company 2');
+
+
+    INSERT INTO Roles (RoleName) 
+    VALUES ('Admin'),
+           ('User');
+
+    INSERT INTO Users ([Username],[PasswordHash],[Email],[CompanyId],[CreatedAt],[UpdatedAt])
+    VALUES 
+        (N'markt', N'$2a$11$KhcnN6RdAl4zUigJbp4yzeRgBW34h/sm7dIjSNqcc6YN2/RBK1vHC', N'mt@gmail.com', 1, GETDATE(), GETDATE()),
+        (N'usercompany2', N'$2a$11$JL/ekfwI5y51oM/hn7o.KOjmwIzS9DC9iG0eE/KqrpnUIDQeAQAwi', N'user@gmail.com', 2, GETDATE(), GETDATE()),
+        (N'testUserCompany2', N'$2a$11$aWEpbJJHyWpN6rd2SRw9Ze.DcD0fzzZnASAJIjbKL.DrJh/xa1kE2', N'testuser@gmail.com', 2, GETDATE(), GETDATE()),
+        (N'johndoeCompany2', N'$2a$11$tzXg4lswJZbzxrdmR30zEuKON1dX15YBdnuCdlpc0IpWtI7RoeYTO', N'johndoeCompany2@gmail.com', 2, GETDATE(), GETDATE());
+
+
+    INSERT INTO UserRoles (UserId, RoleId, AssignedAt)
+    VALUES 
+        (1, 1, GETDATE()), 
+        (2, 1, GETDATE()), 
+        (3, 2, GETDATE()), 
+        (4, 2, GETDATE());
+
+    COMMIT;  -- Commit the transaction
+END TRY
+BEGIN CATCH
+    ROLLBACK;  
+    PRINT 'Error occurred: ' + ERROR_MESSAGE();
+END CATCH;
+GO

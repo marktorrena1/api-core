@@ -1,13 +1,13 @@
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/bin/Debug/net8.0/api-core-library.deps.json
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/bin/Debug/net8.0/api-core-library.dll
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/bin/Debug/net8.0/api-core-library.pdb
+/Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.csproj.AssemblyReference.cache
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.GeneratedMSBuildEditorConfig.editorconfig
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.AssemblyInfoInputs.cache
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.AssemblyInfo.cs
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.csproj.CoreCompileInputs.cache
+/Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.sourcelink.json
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.dll
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/refint/api-core-library.dll
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.pdb
 /Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/ref/api-core-library.dll
-/Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.csproj.AssemblyReference.cache
-/Users/markjeotorrena/Projects/api-core-app/api-core-library/obj/Debug/net8.0/api-core-library.sourcelink.json
