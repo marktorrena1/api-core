@@ -5,7 +5,8 @@ namespace api_core_library.Models;
 
 public class Company
 {
-    public Guid Id { get; set; }
-    public int CompanyId { get; set; }
+    public int Id { get; set; }
     public required string CompanyName { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

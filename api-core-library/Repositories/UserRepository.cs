@@ -16,73 +16,121 @@ public class UserRepository : IUserRepository
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
+    private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
 
     public async Task<IEnumerable<User>> GetAllUsersAsync()
     {
-        using (var connection = new SqlConnection(_connectionString))
+        try
         {
-            return await connection.QueryAsync<User>("SELECT * FROM Users");
+            using (var connection = CreateConnection())
+            {
+                return await connection.QueryAsync<User>("SELECT * FROM Users");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while retrieving users.", ex);
         }
     }
 
     public async Task<UserDto> GetUserByUsernameAsync(string username)
     {
-         var sql = @"
-        SELECT u.Id, u.username, u.passwordHash, u.Email, u.CompanyId, r.RoleName 
-        FROM Users u
-        INNER JOIN UserRoles ur ON u.Id = ur.UserId
-        INNER JOIN Roles r ON ur.RoleId = r.Id
-        WHERE u.username = @username;";
+        const string sql = @"
+            SELECT u.Id, u.username, u.passwordHash, u.Email, u.CompanyId, r.RoleName 
+            FROM Users u
+            INNER JOIN UserRoles ur ON u.Id = ur.UserId
+            INNER JOIN Roles r ON ur.RoleId = r.Id
+            WHERE u.username = @username;";
 
-        using (var connection = new SqlConnection(_connectionString))
+        try
         {
-            return await connection.QuerySingleOrDefaultAsync<UserDto>(sql, new { username });
+            using (var connection = CreateConnection())
+            {
+                return await connection.QuerySingleOrDefaultAsync<UserDto>(sql, new { username });
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while retrieving the user by username.", ex);
         }
     }
 
     public async Task<IEnumerable<UserDto>> GetUserAsync(UserDto user)
     {
-        var sql = @"
-        SELECT u.Id, u.username, u.passwordHash, u.Email, u.CompanyId, r.RoleName 
-        FROM Users u
-        INNER JOIN UserRoles ur ON u.Id = ur.UserId
-        INNER JOIN Roles r ON ur.RoleId = r.Id
-        WHERE (@Username IS NULL OR @Username = '' OR u.username = @Username)
-        AND (@RoleName IS NULL OR @RoleName = '' OR r.RoleName = @RoleName)
-        AND u.CompanyId = @CompanyId;";
+        const string sql = @"
+            SELECT u.Id, u.username, u.passwordHash, u.Email, u.CompanyId, r.RoleName 
+            FROM Users u
+            INNER JOIN UserRoles ur ON u.Id = ur.UserId
+            INNER JOIN Roles r ON ur.RoleId = r.Id
+            WHERE (@Username IS NULL OR @Username = '' OR u.username = @Username)
+            AND (@RoleName IS NULL OR @RoleName = '' OR r.RoleName = @RoleName)
+            AND u.CompanyId = @CompanyId;";
 
-        using (var connection = new SqlConnection(_connectionString))
+        try
         {
-            return await connection.QueryAsync<UserDto>(sql, new { user.Username, user.RoleName, user.CompanyId});
+            using (var connection = CreateConnection())
+            {
+                return await connection.QueryAsync<UserDto>(sql, new { user.Username, user.RoleName, user.CompanyId });
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while retrieving users with filters.", ex);
         }
     }
 
     public async Task AddUserAsync(User user)
     {
-        using (var connection = new SqlConnection(_connectionString))
+        const string sql = "INSERT INTO Users (Username, PasswordHash, Email, CompanyId, CreatedAt, UpdatedAt) VALUES (@Username, @PasswordHash, @Email, @CompanyId, @CreatedAt, @UpdatedAt)";
+
+        try
         {
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
-            var sql = "INSERT INTO Users (Username, PasswordHash, Email, CompanyId, CreatedAt, UpdatedAt) VALUES (@Username, @PasswordHash, @Email, @CompanyId, @CreatedAt, @UpdatedAt)";
-            await connection.ExecuteAsync(sql, user);
+            using (var connection = CreateConnection())
+            {
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+                await connection.ExecuteAsync(sql, user);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while adding a new user.", ex);
         }
     }
 
     public async Task UpdateUserAsync(User user)
     {
-        using (var connection = new SqlConnection(_connectionString))
+        const string sql = "UPDATE Users SET Username = @Username, PasswordHash = @PasswordHash, Email = @Email, CompanyId = @CompanyId, UpdatedAt = @UpdatedAt WHERE Id = @Id";
+        user.UpdatedAt = DateTime.UtcNow;
+
+        try
         {
-            var sql = "UPDATE Users SET Username = @Username, PasswordHash = @PasswordHash, Email = @Email, CompanyId = @CompanyId, UpdatedAt = @UpdatedAt WHERE Id = @Id";
-            await connection.ExecuteAsync(sql, user);
+            using (var connection = CreateConnection())
+            {
+                await connection.ExecuteAsync(sql, user);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while updating the user.", ex);
         }
     }
 
     public async Task DeleteUserAsync(int id)
     {
-        using (var connection = new SqlConnection(_connectionString))
+        const string sql = "DELETE FROM Users WHERE Id = @Id";
+
+        try
         {
-            await connection.ExecuteAsync("DELETE FROM Users WHERE Id = @Id", new { Id = id });
+            using (var connection = CreateConnection())
+            {
+                await connection.ExecuteAsync(sql, new { Id = id });
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while deleting the user.", ex);
         }
     }
 
-    
+
 }
